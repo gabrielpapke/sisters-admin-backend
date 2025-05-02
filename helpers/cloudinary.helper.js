@@ -13,13 +13,15 @@ export default class CloudinaryHelper {
 							folder,
 						});
 
-						const optimizeUrl = cloudinary.url(result.public_id, {
+						let optimizeUrl = cloudinary.url(result.public_id, {
 							width: 1200,
 							height: 1200,
 							crop: "auto",
 							quality: "auto",
-							fetch_format: "auto",
+							format: "jpg",
 						});
+
+						optimizeUrl = optimizeUrl.split("?_a=")[0];
 
 						return optimizeUrl;
 					} catch (error) {

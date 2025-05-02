@@ -5,20 +5,22 @@ import { SiteEL } from "../../products/el.js";
 export default class ExportImagesService {
 	scraper = new WebsiteScraperHelper();
 
-	constructor(supplier, products) {
-		this.site = this.getSite(supplier, products);
+	constructor(supplier, url, name) {
+		this.site = this.getSite(supplier);
+		this.url = url;
+		this.name = name;
 	}
 
-	getSite(supplier, products) {
+	getSite(supplier) {
 		if (supplier === "EL") {
-			return new SiteEL(products, supplier);
+			return new SiteEL(supplier);
 		}
 
 		return null;
 	}
 
-	async getOriginUrls(product) {
-		const $ = await this.scraper.scrape(product.url);
+	async getOriginUrls() {
+		const $ = await this.scraper.scrape(this.url);
 
 		return $(this.site.imageFinder.container)
 			.find(this.site.imageFinder.element)
@@ -37,18 +39,17 @@ export default class ExportImagesService {
 
 	async getGeneratedUrls() {
 		const allGeneratedPaths = [];
-		for (const product of this.site.products) {
-			const imageURLs = await this.getOriginUrls(product);
 
-			if (imageURLs && imageURLs.length > 0) {
-				const generatedPaths = await CloudinaryHelper.uploadImagesToCloudinary(
-					imageURLs,
-					this.site.name,
-					product.name
-				);
+		const imageURLs = await this.getOriginUrls();
 
-				allGeneratedPaths.push(...generatedPaths);
-			}
+		if (imageURLs && imageURLs.length > 0) {
+			const generatedPaths = await CloudinaryHelper.uploadImagesToCloudinary(
+				imageURLs,
+				this.site.name,
+				this.name
+			);
+
+			allGeneratedPaths.push(...generatedPaths);
 		}
 
 		return allGeneratedPaths;

@@ -3,9 +3,9 @@ import ExportImagesService from "./exportImagesService.js";
 const exportController = {
 	async exportImages(req, res) {
 		try {
-			const { supplier, products } = req.body;
+			const { supplier, url, name } = req.body;
 
-			if (!supplier || !products || !Array.isArray(products)) {
+			if (!supplier || !url || !name) {
 				return res.status(400).json({ error: "Dados inválidos" });
 			}
 
@@ -13,7 +13,7 @@ const exportController = {
 				return res.status(400).json({ error: "Site não suportado" });
 			}
 
-			const exportImageService = new ExportImagesService(supplier, products);
+			const exportImageService = new ExportImagesService(supplier, url, name);
 			const imageUrls = await exportImageService.getGeneratedUrls();
 
 			if (imageUrls.length === 0) {
